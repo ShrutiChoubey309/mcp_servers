@@ -3,16 +3,32 @@
 This repository contains a comprehensive list of all the MCP (Model Context Protocol) servers I have experimented with. Each server is designed to perform a specific function, and is tested for compatibility within the MCP framework.
 
 ---
+## Index
 
+1. [Brave Search MCP Server](#1-brave-search-mcp-server)
+2. [Tavily Search MCP Server](#2-tavily-search-mcp-server)
+3. [Fetch MCP Server](#3-fetch-mcp-server)
+4. [Google Maps MCP Server](#4-google-maps-mcp-server)
+5. [Sequential Thinking MCP Server](#5-sequential-thinking-mcp-server)
+6. [Weather MCP](#6-weather-mcp)
+7. [Slack MCP Server](#8-slack-mcp-server)
+
+---
 ##  Tested MCP Servers
 
-### 1. Brave Search MCP
+### 1. Brave Search MCP Server
 - **Purpose**: Perform real-time search queries using Brave’s search engine.
 - **Status**:  Working
 - **Use Case**: General-purpose web search, especially for privacy-focused results.
 - **Notes**:
   - Fast responses.
   - Sometimes limited by request quotas.
+  - You need to provide the API key.
+
+**Get your Brave Search API key from:**  
+- Sign up for a [https://brave.com/search/api/](https://brave.com/search/api/)
+- Choose a plan (Free tier available with 2,000 queries/month)
+- Generate your API key from the developer dashboard
 
 #### Brave Search Server Configuration
 Here is how the Brave Search MCP server is configured in the `mcpServers` JSON block:
@@ -31,16 +47,21 @@ Here is how the Brave Search MCP server is configured in the `mcpServers` JSON b
   }
 }
 ```
-
 ---
 
-### 2. Tavily Search MCP
+### 2. Tavily Search MCP Server
 - **Purpose**: Use the Tavily API for structured and concise web search.
 - **Status**:  Working
 - **Use Case**: Helpful in retrieval-augmented generation (RAG) pipelines.
 - **Notes**:
   - More structured than Brave.
   - Good for summarizing answers directly.
+  - You need to provide the API key.
+
+
+**Get your Tavily Search API key from:**  
+- Sign up for a [https://www.tavily.com/](https://www.tavily.com/)
+- Your API Key will be visible on the dashboard under API Access
 
 #### Tavily Server Configuration
 
@@ -55,10 +76,9 @@ Here is how the Brave Search MCP server is configured in the `mcpServers` JSON b
   }
 }
 ```
-
 ---
 
-### 3. Fetch MCP
+### 3. Fetch MCP Server
 - **Purpose**: Generic HTTP GET/POST-based fetching of data from external URLs or APIs.
 - **Status**:  Working
 - **Use Case**: Useful for scraping or calling arbitrary REST APIs.
@@ -66,7 +86,7 @@ Here is how the Brave Search MCP server is configured in the `mcpServers` JSON b
   - Flexible but needs request config.
   - Requires validation for rate limits and headers.
 
-#### 🔧 Fetch Server Configuration
+#### Fetch Server Configuration
 
 ```json
 "mcpServers": {
@@ -89,13 +109,19 @@ pip install mcp-server-fetch
 
 ---
 
-### 4. Google Maps MCP
+### 4. Google Maps MCP Server
 - **Purpose**: Fetch geolocation, directions, or place data from Google Maps API.
 - **Status**:  Working (API key required)
 - **Use Case**: Location-based queries, directions, nearby places.
 - **Notes**:
   - Requires Google Cloud billing & API key.
   - Quotas may apply.
+  - You need to provide the API key.
+
+**Get your Google Maps API key from:**  
+- Go to the [https://console.cloud.google.com/](https://console.cloud.google.com/), create a project, and enable the Maps APIs you need (like Maps JavaScript API, Geocoding API, etc.).
+- Go to APIs & Services → Credentials, click "Create Credentials" → "API Key", and copy the generated key.
+- (Optional) Set up billing and restrict the key for security (recommended).
 
 #### Google Maps Server Configuration
 
@@ -116,7 +142,7 @@ pip install mcp-server-fetch
 
 ---
 
-### 5. Sequential Thinking MCP
+### 5. Sequential Thinking MCP Server
 - **Purpose**: Enables chain-of-thought or multistep reasoning via subagent execution.
 - **Status**:  Working
 - **Use Case**: Tasks requiring intermediate reasoning or tool calling.
@@ -171,38 +197,57 @@ This is a simple MCP server that uses the [weather.gov](https://www.weather.gov/
 
 ---
 
-### 7. IP Info MCP
-
-This is a simple MCP server that uses the [ipinfo.io](https://ipinfo.io) API to get detailed information about an IP address.
-
-- **Purpose**: Retrieve geolocation and network information based on an IP address using the IPInfo API.
+### 7. Slack MCP Server
+- **Purpose**: Send messages, alerts, or updates to Slack channels or users using the Slack Web API.
 - **Status**:  Working
-- **Use Case**: Useful for IP address lookup, security monitoring, analytics, and location-based services.
+- **Use Case**: Ideal for notifications, bot-based responses, and workflow automation via RAG pipelines or external triggers..
 - **Notes**:
-  - Requires a valid IPInfo API token.
-  - Useful in dashboards or any tool needing IP metadata.
+  - Can be used to send status updates from other MCP tools or agents.
+  - Supports channel names or user IDs as message targets..
 
-#### IP Info Server Configuration
+## Setup
+
+1. Create a Slack App:
+   - Visit the [Slack Apps page](https://api.slack.com/apps)
+   - Click "Create New App"
+   - Choose "From scratch"
+   - Name your app and select your workspace
+
+2. Configure Bot Token Scopes:
+   Navigate to "OAuth & Permissions" and add these scopes:
+   - `channels:history` - View messages and other content in public channels
+   - `channels:read` - View basic channel information
+   - `chat:write` - Send messages as the app
+   - `reactions:write` - Add emoji reactions to messages
+   - `users:read` - View users and their basic information
+   - `users.profile:read` - View detailed profiles about users
+
+4. Install App to Workspace:
+   - Click "Install to Workspace" and authorize the app
+   - Save the "Bot User OAuth Token" that starts with `xoxb-`
+
+5. Get your Team ID (starts with a `T`) by following [this guidance](https://slack.com/help/articles/221769328-Locate-your-Slack-URL-or-ID#find-your-workspace-or-org-id)
+
+#### Slack Server Configuration
 
 ```json
 "mcpServers": {
-  "ipinfo": {
-    "command": "uvx",
-    "args": [
-      "--from",
-      "git+https://github.com/briandconnelly/mcp-server-ipinfo.git",
-      "mcp-server-ipinfo"
-    ],
-    "env": {
-      "IPINFO_API_TOKEN": "<YOUR TOKEN HERE>"
+    "slack": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-slack"
+      ],
+      "env": {
+        "SLACK_BOT_TOKEN": "xoxb-your-bot-token",
+        "SLACK_TEAM_ID": "T01234567",
+        "SLACK_CHANNEL_IDS": "C01234567, C76543210"
+      }
     }
   }
-}
 ```
-
-> **Note**: You'll need to create a token to use the IPInfo API. Sign up for a free account at [ipinfo.io/signup](https://ipinfo.io/signup).
-
 ---
+
 
 ## MCP Server Setup & Integration Notes
 
