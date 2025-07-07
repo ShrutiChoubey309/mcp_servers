@@ -11,7 +11,7 @@ This repository contains a comprehensive list of all the MCP (Model Context Prot
 4. [Google Maps MCP Server](#4-google-maps-mcp-server)
 5. [Sequential Thinking MCP Server](#5-sequential-thinking-mcp-server)
 6. [Weather MCP](#6-weather-mcp)
-7. [Slack MCP Server](#8-slack-mcp-server)
+7. [Slack MCP Server](#7-slack-mcp-server)
 
 ---
 ##  Tested MCP Servers
